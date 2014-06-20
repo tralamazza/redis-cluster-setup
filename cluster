@@ -1,0 +1,24 @@
+#!/bin/bash
+
+REDIS_FOLDER=${1:-"$HOME/Projects/redis/src"}
+REDIS_SERVER="$REDIS_FOLDER/redis-server"
+REDIS_TRIB="$REDIS_FOLDER/redis-trib.rb"
+REDIS_CLI="$REDIS_FOLDER/redis-cli"
+REDIS_CLUSTER_PORTS="7000 7001 7002 7003 7004 7005"
+
+HOST_PORT_STR=""
+for p in $REDIS_CLUSTER_PORTS
+do
+	echo "create folder $p"
+	mkdir -p $p
+	cp cluster.template.conf $p/redis.conf
+	cd $p
+	sed -i -e "s/PORT/$p/g" redis.conf
+	echo "starting $p"
+	$REDIS_SERVER ./redis.conf
+	HOST_PORT_STR="$HOST_PORT_STR 127.0.0.1:$p"
+	cd ..
+done
+$REDIS_TRIB create --replicas 1 $HOST_PORT_STR
+echo "CLUSTER NODES"
+$REDIS_CLI -p 7000 CLUSTER NODES

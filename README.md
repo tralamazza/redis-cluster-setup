@@ -2,7 +2,7 @@
 
 Create and start a local cluster with 6 redis-server's
 
-    ./cluster
+    ./cluster <path to your redis src folder>
 
 Killall is your friend:
 
